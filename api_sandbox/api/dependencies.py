@@ -4,7 +4,7 @@ example dependencies for my API
 
 from typing_extensions import Annotated
 
-from fastapi import Header, HTTPException
+from fastapi import Header, HTTPException, status
 
 from api_sandbox.api.models import Item
 
@@ -31,5 +31,12 @@ class HeaderAuth:
         self.api_key = api_key
 
     def __call__(self, x_key: Annotated[str, Header()] = ""):
+        if not x_key:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Please provide an API key in the x-key header",
+            )
         if x_key != self.api_key:
-            raise HTTPException(status_code=401, detail="Invalid API key")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key"
+            )
